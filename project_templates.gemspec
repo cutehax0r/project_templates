@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative "lib/project_templates/version"
+
 Gem::Specification.new do |s|
   s.name = "project_templates"
-  s.version = "0.0.1"
+  s.version = ProjectTemplates::VERSION
   s.authors = ["Cute HaX0r"]
   s.email = "cutehaX0r@github.com"
 
