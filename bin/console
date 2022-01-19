@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "project_templates"
+
+# Add initialization code here
+
+require "pry"
+Pry.start
