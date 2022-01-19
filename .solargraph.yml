@@ -1,0 +1,12 @@
+---
+include:
+- "**/*.rb"
+- "exe/*"
+exclude:
+- test/**/*
+- "bin/*"
+require: []
+domains: []
+reporters:
+- rubocop
+max_files: 50000
