@@ -1,5 +1,4 @@
 --dir
 .
---ignore
-bin/
-test/
+--ignore=/vendor/bundle
+--ignore=/test
