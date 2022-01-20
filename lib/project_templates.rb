@@ -3,6 +3,7 @@
 
 require "sorbet-runtime"
 
+require_relative "project_templates/app"
 require_relative "project_templates/version"
 
 module ProjectTemplates
