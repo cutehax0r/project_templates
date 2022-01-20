@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# typed: strict
+
+require "project_templates"
+require "sorbet-runtime"
+
+app = ProjectTemplates::App.new
+app.run
