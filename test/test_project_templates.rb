@@ -10,4 +10,8 @@ class TestProjectTemplates < MiniTest::Test
   def test_it_has_an_app
     refute_nil ProjectTemplates::App
   end
+
+  def test_it_has_a_config
+    refute_nil ProjectTemplates::Config
+  end
 end
