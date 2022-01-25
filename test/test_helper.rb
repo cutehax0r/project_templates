@@ -4,5 +4,7 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "minitest/autorun"
 require "minitest/mock"
+require "minitest/focus"
+require "pry"
 
 require "project_templates"
