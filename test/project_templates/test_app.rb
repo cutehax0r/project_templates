@@ -13,6 +13,11 @@ class TestApp < MiniTest::Test
     assert_respond_to app, :run
   end
 
+  def test_it_can_be_initialized_with_a_config
+    config = nil
+    ProjectTemplates::App.new(config)
+  end
+
   def test_it_prints_hello
     assert_output(/Hello/) { app.run }
   end

@@ -4,8 +4,20 @@
 require "sorbet-runtime"
 
 module ProjectTemplates
+  # This responsible for doing all the work of the application. Once
+  # configured you run the application and it'll run according to the
+  # configuration. Note that there is going to be a separate CLIApplication
+  # class that handles setting-up the application and running it. That CLI
+  # will handle command line argument parsing displaying help, etc. This is
+  # so that the App class can be used by a graphical interface or even a
+  # web-app in the future.
   class App
     extend T::Sig
+
+    sig { params(config: T.nilable(Config)).void }
+    def initialize(config = nil)
+      @config = config
+    end
 
     sig { void }
     # The main entry point of the application. Instantiate the application
