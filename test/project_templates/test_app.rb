@@ -14,7 +14,7 @@ class TestApp < MiniTest::Test
   end
 
   def test_it_can_be_initialized_with_a_config
-    config = nil
+    config = MiniTest::Mock.new(ProjectTemplates::Config.new)
     ProjectTemplates::App.new(config)
   end
 
