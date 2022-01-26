@@ -58,7 +58,7 @@ module ProjectTemplates
     # template_path to produce project_path
     attr_accessor :project_name
 
-    # TODO: attr_accessor  :working_path, :user_variables, :project_variables
+    # TODO: attr_accessor  :user_variables, :project_variables, :run_variables
 
     sig do
       params(
