@@ -3,10 +3,11 @@
 require "test_helper"
 
 class TestApp < MiniTest::Test
+  include ClassUnderTest
   attr_reader :app
 
   def setup
-    @app = ProjectTemplates::App.new
+    @app = class_under_test.new
   end
 
   def test_can_be_run
@@ -15,7 +16,7 @@ class TestApp < MiniTest::Test
 
   def test_can_be_initialized_with_a_config
     config = MiniTest::Mock.new(ProjectTemplates::Config.new)
-    ProjectTemplates::App.new(config)
+    class_under_test.new(config)
   end
 
   def test_prints_hello
