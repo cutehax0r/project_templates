@@ -4,14 +4,14 @@ require "test_helper"
 
 class TestProjectTemplates < MiniTest::Test
   def test_it_has_a_version
-    refute_nil ProjectTemplates::VERSION
+    refute_nil(ProjectTemplates::VERSION)
   end
 
   def test_it_has_an_app
-    refute_nil ProjectTemplates::App
+    refute_nil(ProjectTemplates::App)
   end
 
   def test_it_has_a_config
-    refute_nil ProjectTemplates::Config
+    refute_nil(ProjectTemplates::Config)
   end
 end
