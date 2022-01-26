@@ -6,6 +6,20 @@ AllCops:
   SuggestExtensions: false
   TargetRubyVersion: 3.1
 
+Metrics/AbcSize:
+  Exclude:
+    - "test/**/*"
+
+Metrics/MethodLength:
+  Exclude:
+    - "test/**/*"
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 120
+
 Style/Documentation:
   Enabled: false
 
@@ -22,8 +36,3 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: consistent_comma
 
-Layout/EmptyLineAfterMagicComment:
-  Enabled: false
-
-Layout/LineLength:
-  Max: 120
