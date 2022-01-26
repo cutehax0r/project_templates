@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
     "--main", "README.md",
     "--line-numbers",
     "--inline-source",
-    "--quiet"
+    "--quiet",
   ]
 
   s.add_development_dependency "github-markup"
