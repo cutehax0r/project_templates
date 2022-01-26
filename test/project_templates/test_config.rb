@@ -12,15 +12,21 @@ class TestConfig < MiniTest::Test
     @config = class_under_test.new
   end
 
+  test_has_attribute(:config, :dry_run, readable: true, writable: true, interrogatable: true)
   test_has_attribute(:config, :template_path, readable: true, writable: true)
   test_has_attribute(:config, :project_path, readable: true, writable: true)
   test_has_attribute(:config, :target_path, readable: true, writable: true)
-  test_has_attribute(:config, :dry_run, readable: true, writable: true, interrogatable: true)
+  test_has_attribute(:config, :working_path, readable: true, writable: true)
+  test_has_attribute(:config, :project_name, readable: true, writable: true)
+  test_has_attribute(:config, :target_name, readable: true, writable: true)
 
   def test_defines_default_constants
     assert_equal(Pathname.new("~").expand_path, class_under_test::DEFAULT_TEMPLATE_PATH)
     assert_equal(Pathname.new("~").expand_path, class_under_test::DEFAULT_PROJECT_PATH)
     assert_equal(Pathname.new(Dir.pwd).expand_path, class_under_test::DEFAULT_TARGET_PATH)
+    assert_equal(Pathname.new(Dir.pwd).expand_path, class_under_test::DEFAULT_WORKING_PATH)
+    assert_equal("target", class_under_test::DEFAULT_TARGET_NAME)
+    assert_equal("project", class_under_test::DEFAULT_PROJECT_NAME)
   end
 
   def test_initialize_uses_defaults
@@ -36,6 +42,9 @@ class TestConfig < MiniTest::Test
       template_path: Pathname.new("/").expand_path,
       project_path: Pathname.new("/").expand_path,
       target_path: Pathname.new("/").expand_path,
+      working_path: Pathname.new("/").expand_path,
+      project_name: "new_project",
+      target_name: "some_target",
     }
     inited_config = class_under_test.new(**args)
     args.each do |argument, expected_value|
