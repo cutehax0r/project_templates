@@ -15,12 +15,16 @@ module ProjectTemplates
     DEFAULT_TEMPLATE_PATH = T.let(Pathname.new("~").expand_path, Pathname)
     DEFAULT_PROJECT_PATH = T.let(Pathname.new("~").expand_path, Pathname)
     DEFAULT_TARGET_PATH = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
+    DEFAULT_WORKING_PATH = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
+    DEFAULT_TARGET_NAME = T.let("target", String)
+    DEFAULT_PROJECT_NAME = T.let("project", String)
 
     sig { returns(T::Boolean) }
     # When dry-run is true no changes to the file system will be made but
     # all other steps will be completed. Access to the target path will be
     # verified and all other compilation steps will complete.
     attr_accessor :dry_run
+    alias dry_run? dry_run
 
     sig { returns(Pathname) }
     # The path where template projects are located. This is the path where
@@ -39,24 +43,54 @@ module ProjectTemplates
     # working directory
     attr_accessor :target_path
 
-    # TODO: attr_accessor :template_name, :target_name, :user_variables, :project_variables
+    sig { returns(Pathname) }
+    # The working directory, where the new project will be created. Defaults to
+    # the current working directory.
+    attr_accessor :working_path
 
-    sig { params(dry_run: T::Boolean, template_path: Pathname, project_path: Pathname, target_path: Pathname).void }
+    sig { returns(String) }
+    # The name of the target. Appended to the end of working directory to form
+    # target_path.
+    attr_accessor :target_name
+
+    sig { returns(String) }
+    # the name of the project directory to use as a source. Appended to
+    # template_path to produce project_path
+    attr_accessor :project_name
+
+    # TODO: attr_accessor  :working_path, :user_variables, :project_variables
+
+    sig do
+      params(
+        dry_run: T::Boolean,
+        template_path: Pathname,
+        project_path: Pathname,
+        target_path: Pathname,
+        working_path: Pathname,
+        project_name: String,
+        target_name: String
+      ).void
+    end
     # Initialize a config by explicitly setting all of the values. If you
     # don't want to set all values consider using one of the class methods
-    # instead.
-    def initialize(
+    # instead. Paths and Variables should probably become objects but for
+    # now the rubocop rule about param lists will be ignored
+    def initialize( # rubocop:disable Metrics/ParameterLists
       dry_run: false,
       template_path: DEFAULT_TEMPLATE_PATH,
       project_path: DEFAULT_PROJECT_PATH,
-      target_path: DEFAULT_TARGET_PATH
+      target_path: DEFAULT_TARGET_PATH,
+      working_path: DEFAULT_TARGET_PATH,
+      project_name: DEFAULT_PROJECT_NAME,
+      target_name: DEFAULT_TARGET_NAME
     )
       @dry_run = dry_run
-      @template_path = T.let(template_path, Pathname)
-      @project_path = T.let(project_path, Pathname)
-      @target_path = T.let(target_path, Pathname)
+      @template_path = template_path
+      @project_path = project_path
+      @target_path = target_path
+      @working_path = working_path
+      @project_name = project_name
+      @target_name = target_name
     end
-
-    alias dry_run? dry_run
   end
 end
