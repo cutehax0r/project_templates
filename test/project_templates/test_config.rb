@@ -4,11 +4,11 @@ require "test_helper"
 
 class TestConfig < MiniTest::Test
   extend HasAttributeHelper
+  include ClassUnderTest
 
-  attr_reader :config, :class_under_test
+  attr_reader :config
 
   def setup
-    @class_under_test = ProjectTemplates::Config
     @config = class_under_test.new
   end
 
