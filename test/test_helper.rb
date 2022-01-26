@@ -9,6 +9,22 @@ require "pry"
 
 require "project_templates"
 
+module ClassUnderTest
+  # This is a helper that returns the name of the class. This feature is
+  # implemented pretty naively for the sake of readability. It maps
+  # `TestFoobar` to `ProjectTemplates::Foobar`. At least for the moment a more
+  # complicated helper is not required, just "include it into your test file"
+  # to make it available.
+  def class_under_test
+    return @class_under_test if defined?(@class_under_test)
+
+    namespace = "ProjectTemplates"
+    test_name = self.class.to_s
+    full_class_name = [namespace, test_name[4..]].join("::")
+    @class_under_test = Kernel.const_get(full_class_name)
+  end
+end
+
 module HasAttributeHelper
   # A helper to ensure that a class has an attribute defined.
   #   * `instance` is the symbol for a method that will return an instance
