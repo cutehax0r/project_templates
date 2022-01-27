@@ -5,6 +5,54 @@
 require "project_templates"
 require "sorbet-runtime"
 
-config = ProjectTemplates::Config.new(dry_run: true)
+# have to load variables
+# have to set paths
+
+dry_run = false
+
+# working_directory
+#   --working-directory -w
+#   global_config.working_directory
+#   ENV["working_directory"]
+#   Dir.cwd
+
+# template_path
+#   --template-path -t
+#   global_config.template_path
+#   ENV["template_path"]
+#   ~/.local/share/project_templates/projects
+
+# project_path
+#   --project-path -p
+#   template_path + project_name
+
+# target_path
+#   --target-path -o
+#   working_directory + target_name
+
+# project_name
+#   --project -j
+#   argv[1]
+
+# target_name
+#   --target-name -n
+#   argv[2]
+
+# global_variables
+#   --global-variables -g
+#   ENV["global_variables_path"]
+#   ~/.config/project_templates/variables.yaml
+#   global_config.vars
+
+# project_variables
+#   --project-variables -r
+#   project_path + variables.yaml
+
+# run variables
+#   --variables -s
+
+# def initialize()
+
+config = ProjectTemplates::Config.new(dry_run: dry_run)
 app = ProjectTemplates::App.new(config)
 app.run
