@@ -23,7 +23,7 @@ module ProjectTemplates
     class << self
       extend T::Sig
 
-      sig { params(input: T.any(String, OpenStruct, T::Hash[T.untyped, T.untyped])).returns(Dictionary) }
+      sig { params(input: T.any(String, OpenStruct, T::Hash[T.untyped, T.untyped])).returns(T.attached_class) }
       # The valid inputs to load variables are:
       #   * `Hash`: a standard ruby dictionary of nested key_value pairs. All keys
       #      must respond to `to_sym` or loading will fail.
@@ -47,7 +47,7 @@ module ProjectTemplates
 
       private
 
-      sig { params(input: String).returns(Dictionary) }
+      sig { params(input: String).returns(T.attached_class) }
       # You can pass a string and so long as it passes through the YAML and JSON
       # parser to produce an `OpenStruct` then everything is fine. Some valid JSON
       # and YAML will not produce a dictionary. E.g. "[1, 2, 3]" is valid for
