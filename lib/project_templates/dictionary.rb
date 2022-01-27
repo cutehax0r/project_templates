@@ -39,6 +39,8 @@ module ProjectTemplates
         when String then load_string(input)
         else T.absurd(input)
         end
+      rescue NoMethodError => e
+        raise(ArgumentError, e.to_s)
       end
 
       alias parse load
