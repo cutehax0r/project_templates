@@ -56,9 +56,9 @@ class TestConfig < MiniTest::Test
       working_path: Pathname.new("/").expand_path,
       project_name: "new_project",
       target_name: "some_target",
-      project_variables: ProjectTemplates::Dictionary.load({ a: 1 }),
-      global_variables: ProjectTemplates::Dictionary.load({ b: 2 }),
-      run_variables: ProjectTemplates::Dictionary.load({ c: 3 }),
+      project_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load({})),
+      global_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load({})),
+      run_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load({})),
     }
     inited_config = class_under_test.new(**args)
     args.each do |argument, expected_value|
