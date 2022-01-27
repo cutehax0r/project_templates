@@ -83,4 +83,9 @@ class TestDictionary < Minitest::Test
     input = "{invalid"
     assert_raises(ArgumentError) { class_under_test.load(input) }
   end
+
+  def test_throws_argument_error_on_ruby_hash_that_doesnt_make_openstruct
+    input = { [1] => "invalid key" }
+    assert_raises(ArgumentError) { class_under_test.load(input) }
+  end
 end
