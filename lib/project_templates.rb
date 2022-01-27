@@ -4,8 +4,8 @@
 require "sorbet-runtime"
 
 require_relative "project_templates/app"
-require_relative "project_templates/config"
 require_relative "project_templates/dictionary"
+require_relative "project_templates/config"
 require_relative "project_templates/version"
 
 module ProjectTemplates

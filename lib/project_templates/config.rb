@@ -18,6 +18,7 @@ module ProjectTemplates
     DEFAULT_WORKING_PATH = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
     DEFAULT_TARGET_NAME = T.let("target", String)
     DEFAULT_PROJECT_NAME = T.let("project", String)
+    DEFAULT_DICTIONARY = T.let(Dictionary.load({}), Dictionary)
 
     sig { returns(T::Boolean) }
     # When dry-run is true no changes to the file system will be made but
@@ -59,6 +60,24 @@ module ProjectTemplates
     attr_accessor :project_name
 
     # TODO: attr_accessor  :user_variables, :project_variables, :run_variables
+    sig { returns(Dictionary) }
+    # Global variables are read from a configuration file and will override
+    # project variables when a conflict occurs. Global variables can in turn be
+    # overridden by variables provided at 'run'.
+    attr_accessor :global_variables
+
+    sig { returns(Dictionary) }
+    # These are variables defined within the project template. They are the
+    # lowest level of priority so that you can override variables (e.g. email,
+    # copyright holder) by defining them globally once instead of needing to
+    # pass overrides on every invocation as command line arguments.
+    attr_accessor :project_variables
+
+    sig { returns(Dictionary) }
+    # Run variables are the most-specific variables. They override variables
+    # defined globally which have in turn overriden variables provided by a
+    # project.
+    attr_accessor :run_variables
 
     sig do
       params(
@@ -68,7 +87,10 @@ module ProjectTemplates
         target_path: Pathname,
         working_path: Pathname,
         project_name: String,
-        target_name: String
+        target_name: String,
+        project_variables: Dictionary,
+        global_variables: Dictionary,
+        run_variables: Dictionary
       ).void
     end
     # Initialize a config by explicitly setting all of the values. If you
@@ -82,7 +104,10 @@ module ProjectTemplates
       target_path: DEFAULT_TARGET_PATH,
       working_path: DEFAULT_TARGET_PATH,
       project_name: DEFAULT_PROJECT_NAME,
-      target_name: DEFAULT_TARGET_NAME
+      target_name: DEFAULT_TARGET_NAME,
+      project_variables: DEFAULT_DICTIONARY,
+      global_variables: DEFAULT_DICTIONARY,
+      run_variables: DEFAULT_DICTIONARY
     )
       @dry_run = dry_run
       @template_path = template_path
@@ -91,6 +116,9 @@ module ProjectTemplates
       @working_path = working_path
       @project_name = project_name
       @target_name = target_name
+      @project_variables = project_variables
+      @global_variables = global_variables
+      @run_variables = run_variables
     end
   end
 end
