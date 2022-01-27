@@ -14,8 +14,10 @@ module ProjectTemplates
   class App
     extend T::Sig
 
-    sig { params(config: T.nilable(Config)).void }
-    def initialize(config = nil)
+    sig { params(config: Config).void }
+    # Setup a config argument with paths and variables. Pass that to the
+    # initializer. Once that's done you can call "run".
+    def initialize(config)
       @config = config
     end
 
@@ -24,6 +26,8 @@ module ProjectTemplates
     # passing arguments and then call "run" to make it work. Execution
     # options can be set before calling run in order to configure the
     # application.
+    # The configuration will be checked and verified and then a new project
+    # will be created.
     def run
       puts "Hello"
     end

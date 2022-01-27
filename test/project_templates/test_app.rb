@@ -7,7 +7,7 @@ class TestApp < MiniTest::Test
   attr_reader :app
 
   def setup
-    @app = class_under_test.new
+    @app = class_under_test.new(MiniTest::Mock.new(ProjectTemplates::Config.new))
   end
 
   def test_can_be_run
