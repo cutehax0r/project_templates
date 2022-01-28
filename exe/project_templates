@@ -8,8 +8,184 @@ require "sorbet-runtime"
 # have to load variables
 # have to set paths
 
-dry_run = false
+module ProjectTemplates
+  # Wraps a possible source a dictionary loader can use. they give a strategy to know if it's "available"
+  # what a description (for 'help'), a strategy for reading, and whether reading succeeded
+  class DictionarySource
+    extend T::Sig
 
+    FILE_DESCRIPTON = T.let("read from a file %s", String)
+    DATA_DESCRIPTON = T.let("read read raw from data", String)
+    EMPTY_DESCRIPTION = T.let("just use an empty data source", String)
+
+    class << self
+      extend T::Sig
+
+      sig { params(path: String, description: T.nilable(String)).returns(T.attached_class) }
+      # make a new file dictionary source
+      def file(path, description: nil)
+        new(path: Pathname.new(path), description: description || FILE_DESCRIPTON % path.to_s)
+      end
+
+      sig { params(data: String, description: T.nilable(String)).returns(T.attached_class) }
+      # make a new raw data source
+      def data(data, description: DATA_DESCRIPTON)
+        new(data:, description:)
+      end
+
+      sig { params(description: T.nilable(String)).returns(T.attached_class) }
+      # make a new raw data source
+      def empty(description: EMPTY_DESCRIPTION)
+        new(data: {}.to_s, description:)
+      end
+
+      # need a way to handle environment variables
+      # one for points at file
+      # one for provides raw data
+    end
+
+    sig { returns(T.nilable(String)) }
+    # a description for the load source for display in help / error messages
+    attr_accessor :description
+
+    sig { returns(T.nilable(String)) }
+    # the data from the provided as a load source
+    attr_accessor :data
+
+    sig { returns(T.nilable(Pathname)) }
+    # the path to a file where data can be loaded
+    attr_accessor :path
+
+    sig { returns(T.nilable(String)) }
+    # If the data source was loaded then this is the data that was loaded from it
+    attr_reader :loaded_data
+
+    sig { returns(T::Boolean) }
+    # Did loading the data happen successfully?
+    def success
+      !!@loaded_data.nil?
+    end
+    alias success? success
+
+    sig { returns(T.nilable(String)) }
+    # If the data source was loaded then this is the data that was loaded from it
+    attr_reader :failure_message
+
+    sig { params(data: T.nilable(String), path: T.nilable(Pathname), description: T.nilable(String)).void }
+    # initializes the data source
+    def initialize(data: nil, path: nil, description: nil)
+      @data = data
+      @path = path
+      @failure_message = nil
+      @description = description.to_s
+      @loaded_data = data
+    end
+
+    sig { returns(T::Boolean) }
+    # maybe this should be passed in the initialize?
+    # if data then raw.  elsif file then file exists && readable
+    def loadable?
+      return true if @data
+
+      false
+      # check if file exists
+    end
+
+    sig { void }
+    # tries to load data and verifies if it worked or not
+    # data pass to dictionary
+    # file read then pass to dictionary
+    def load
+      return if success?
+
+      @loaded_data = File.read(path)
+    rescue Errno::ENOENT, Errno::EISDIR, Errno::EACCES => e
+      @loaded_data = nil
+      @failure_message = "Error loading file: #{e.message}"
+    end
+  end
+
+  # This takes a series of possible "sources" for a directory in priority order
+  # and then finds the first match and uses it to instantiate a directory
+  class DictionaryLoader
+    extend T::Sig
+
+    sig { returns(T::Array[DictionarySource]) }
+    # The ordered list of locations that will be used to load a file
+    attr_reader :sources
+
+    sig { returns(T.nilable(Dictionary)) }
+    # The dictionary, but only if loading was successful
+    attr_reader :dictionary
+
+    sig { returns(T.boolean) }
+    # Did loading succeed?
+    attr_reader :success
+    alias success? success
+
+    sig { params(sources: T::Array[DictionarySource]).void }
+    # Pass in n ordered list of sources. They'll be checked in order by the loader.
+    def initialize(sources)
+      @sources = sources
+      @success = false
+      @dictionary = nil
+    end
+
+    sig { returns(T::Array[DictionarySource]) }
+    # if loading started, this is the detected list of 'loadable' sources
+    def loadable_sources
+      @loadable_sources ||= sources.select(&:loadable?)
+    end
+
+    sig { returns(T.nilable(Dictionary)) }
+    # Does the actual loading of data. Goes through sources one at a time until
+    # an usable one is found then parses that into a dictionary.
+    def load
+      data = loadable_sources.find { |source| source.load && source.success? }
+      @dictionary = Dictionary.load(data.loaded_data) if data
+    end
+  end
+end
+
+main_config_loader = ProjectTemplates::DictionaryLoader.new([
+  #ProjectTemplates::DictionarySource.file(ARGV[0].to_s, description: "command line argument"),
+  #ProjectTemplates::DictionarySource.file(ENV.fetch("PT_CONFIG", ""), description: "try loading from the config env"),
+  ProjectTemplates::DictionarySource.file("/etc/hosts", description: "This is the standard location"),
+  #ProjectTemplates::DictionarySource.empty(description: "try running with no config")
+])
+
+file_config = main_config_loader.load
+puts file_config
+# Initialization process
+# 1. set task (build project, list, help, version, etc)
+#    - bail early if help, version, etc. do the thing
+# 1. Load global config
+#    - bail early if list. do the thing
+# 1. prerp to run
+#    - set project name and target name
+#    - Load project variables
+#    - load global variables
+#    - load run variables
+#    - validate paths
+#    - validate vars
+# 1. dryrun: compute changes and print output
+# 1. build it
+#
+# Global config
+#   --config -c
+#   ENV["CONFIG"]
+#   ~/.config/project_templates/config.yaml
+#
+# Contents:
+#   template_path
+#   working_directory
+#   vars_file
+#   vars
+#     global
+#     project
+#       project_kind_1
+#       project_kind_2
+#
 # working_directory
 #   --working-directory -w
 #   global_config.working_directory
@@ -53,6 +229,6 @@ dry_run = false
 
 # def initialize()
 
-config = ProjectTemplates::Config.new(dry_run: dry_run)
+config = ProjectTemplates::Config.new(dry_run: true)
 app = ProjectTemplates::App.new(config)
 app.run
