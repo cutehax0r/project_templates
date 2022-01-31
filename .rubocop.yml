@@ -17,6 +17,9 @@ Metrics/MethodLength:
 Layout/EmptyLineAfterMagicComment:
   Enabled: false
 
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
 Layout/LineLength:
   Max: 120
 
