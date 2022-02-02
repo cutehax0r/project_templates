@@ -18,7 +18,7 @@ module ProjectTemplates
     DEFAULT_WORKING_PATH = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
     DEFAULT_TARGET_NAME = T.let("target", String)
     DEFAULT_PROJECT_NAME = T.let("project", String)
-    DEFAULT_DICTIONARY = T.let(Dictionary.load({}), Dictionary)
+    DEFAULT_DICTIONARY = T.let(Dictionary.load("{}"), Dictionary)
 
     sig { returns(T::Boolean) }
     # When dry-run is true no changes to the file system will be made but

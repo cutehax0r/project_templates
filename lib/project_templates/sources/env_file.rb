@@ -11,10 +11,12 @@ module ProjectTemplates
 
       DESCRIPTION = "Returns a dictionary from a file containing YAML or JSON pointed at by an environment variable."
 
-      def intiialize(source)
+      sig { override.params(source: ::String).void }
+      # pass the path of a file in an environment variable named in source
+      def initialize(source)
         @source = source
-        target_file = ENV.fetch("source", nil)
-        @path = Pathname.new(target_file).expand_path if target_file
+        target_path = Pathname.new(ENV.fetch("source", nil)).expand_path
+        @path = T.let(target_path, Pathname) if target_path
       end
 
       sig { override.returns(T::Boolean) }

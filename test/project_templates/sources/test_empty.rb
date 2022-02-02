@@ -13,7 +13,7 @@ class TestEmpty < MiniTest::Test
 
   def test_has_a_description
     assert_equal(
-      "Always returns an empty dictionary.",
+      "Returns an empty dictionary.",
       ProjectTemplates::Sources::Empty::DESCRIPTION
     )
   end
