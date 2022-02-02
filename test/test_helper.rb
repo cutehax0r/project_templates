@@ -15,6 +15,8 @@ module ClassUnderTest
   # `TestFoobar` to `ProjectTemplates::Foobar`. At least for the moment a more
   # complicated helper is not required, just "include it into your test file"
   # to make it available.
+  # TODO: make smarter: aware of namespaces. Walk up to test/ then prepend the
+  # default namespace, swap / with :: and to 'camelcase stuff'
   def class_under_test
     return @class_under_test if defined?(@class_under_test)
 
