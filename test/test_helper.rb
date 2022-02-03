@@ -27,6 +27,23 @@ module ClassUnderTest
   end
 end
 
+module MockEnv
+  # A helper to mock environment variables.
+  # * delete remove keys from the environment
+  # * new_env is a hash that ADDS or REPLACES keys in the environment
+  # Requires a block which is executed inside the mocked environment
+  # ENV can be modified within the block as it is restored to once
+  # the block returns.
+  def mock_env(delete: [], **new_env, &block)
+    original_env = ENV.to_h
+    ENV.update(new_env.transform_keys(&:to_s).transform_keys(&:upcase).transform_values(&:to_s))
+    [*delete].map(&:to_s).map(&:upcase).each { ENV.delete(_1) }
+    yield(block)
+  ensure
+    ENV.replace(original_env)
+  end
+end
+
 module HasAttributeHelper
   # A helper to ensure that a class has an attribute defined.
   #   * `instance` is the symbol for a method that will return an instance
