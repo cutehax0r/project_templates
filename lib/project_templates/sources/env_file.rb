@@ -15,10 +15,10 @@ module ProjectTemplates
       # pass the path of a file in an environment variable named in source
       def initialize(source)
         @source = source
-        @dictionary = T.nilable(Dictionary)
-        path = ENV.fetch(source, nil)
-        path = Pathname.new(s).expand_path if path
-        @path = T.let(path, T.nilable(Pathname))
+        @dictionary = T.let(nil, T.nilable(Dictionary))
+        @path = T.let(nil, T.nilable(Pathname))
+        env_path = ENV.fetch(source.upcase, false)
+        @path = Pathname.new(env_path).expand_path if env_path
       end
 
       sig { override.returns(T::Boolean) }
@@ -30,7 +30,7 @@ module ProjectTemplates
       sig { override.returns(T.nilable(Dictionary)) }
       # Creates a new dictionary from the empty hash
       def load_source
-        Dictionary.load(@path.read)
+        Dictionary.load(T.must(@path).read)
       end
     end
   end

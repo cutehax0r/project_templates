@@ -27,6 +27,19 @@ module ClassUnderTest
   end
 end
 
+module FileHelper
+  # A simple helper that builds paths that represent files in the fixture path.
+  # it saves a bit of typing and makes the files a bit shorter
+  def file(name, absolute: true, exist: true)
+    path = Pathname.new(Dir.pwd).join("test/fixtures/files").join(name)
+    message = "File #{name} exists where it should not. Found at #{path}" if !exist && path.exist?
+    message = "File #{name} does not exist where it should. Expected at #{path}" if exist && !path.exist?
+    raise(ArgumentError, message) if message
+
+    absolute ? path.expand_path : path
+  end
+end
+
 module MockEnv
   # A helper to mock environment variables.
   # * delete remove keys from the environment
