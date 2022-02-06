@@ -36,7 +36,8 @@ module FileHelper
     message = "File #{name} does not exist where it should. Expected at #{path}" if exist && !path.exist?
     raise(ArgumentError, message) if message
 
-    absolute ? path.expand_path : path
+    path = path.expand_path if absolute
+    path.to_s
   end
 end
 

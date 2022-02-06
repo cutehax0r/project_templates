@@ -11,7 +11,7 @@ module ProjectTemplates
 
       DESCRIPTION = "Returns a dictionary from a string pointing to a file containing YAML or JSON."
 
-      sig { override.params(source: ::String).void }
+      sig { params(source: ::String).void }
       # must provide a path to a file containing yaml or json
       def initialize(source)
         @source = source
