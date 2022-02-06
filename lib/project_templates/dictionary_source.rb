@@ -39,6 +39,10 @@ module ProjectTemplates
     # if loadable, try to create a dictionary from from the source
     def load
       @dictionary = load_source if loadable? && !loaded?
+    rescue ArgumentError
+      # There's nothing useful that can be done with the error so
+      # just swallow it up and have a nil dictionary
+      @dictionary = nil
     end
 
     sig { abstract.returns(T::Boolean) }

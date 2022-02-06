@@ -24,9 +24,9 @@ class TestString < MiniTest::Test
   end
 
   def test_loads_nil_on_unparsable_string
-    nil_source = class_under_test.new("")
-    assert_raises(ArgumentError) { nil_source.load }
-    assert_nil(nil_source.dictionary)
+    @source = class_under_test.new("")
+    source.load
+    assert_nil(source.dictionary)
   end
 
   def test_loads_a_dictionary_from_a_string

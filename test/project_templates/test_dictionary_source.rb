@@ -100,4 +100,10 @@ class TestDictionarySource < MiniTest::Test
     end
     source.load
   end
+
+  def test_load_consumes_argument_errors_from_load_source
+    source.define_singleton_method(:loadable?) { true }
+    source.define_singleton_method(:load_source) { raise(ArgumentError, "simulate source load failure") }
+    source.load
+  end
 end

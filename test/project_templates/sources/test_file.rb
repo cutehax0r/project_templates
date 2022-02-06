@@ -32,7 +32,7 @@ class TestFile < MiniTest::Test
 
   def test_loads_nil_on_unparsable_file
     @source = class_under_test.new(file("invalid.json", exist: true))
-    assert_raises(ArgumentError) { source.load }
+    source.load
     assert_nil(source.dictionary)
   end
 

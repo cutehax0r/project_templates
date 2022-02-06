@@ -39,7 +39,7 @@ class TestEnvFile < MiniTest::Test
 
   def test_loads_nil_on_unparsable_file
     @source = mock_env(SOME_ENV: file("invalid.json")) { class_under_test.new("SOME_ENV") }
-    assert_raises(ArgumentError) { source.load }
+    source.load
     assert_nil(source.dictionary)
   end
 

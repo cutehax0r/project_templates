@@ -33,9 +33,7 @@ class TestEnvString < MiniTest::Test
   end
 
   def test_loads_nil_on_unparsable_string
-    mock_env(SOME_ENV: "foo") do
-      assert_raises(ArgumentError) { source.load }
-    end
+    mock_env(SOME_ENV: "foo") { source.load }
     assert_nil(source.dictionary)
   end
 
