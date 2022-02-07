@@ -20,20 +20,8 @@ class TestDictionary < Minitest::Test
     assert_equal 123, dict.foo
   end
 
-  def test_loads_with_ruby_hash
-    input = { foo: 123 }
-    dict = class_under_test.load(input)
-    assert_equal 123, dict.foo
-  end
-
-  def test_loads_with_openstruct
-    input = OpenStruct.new(foo: 123)
-    dict = class_under_test.load(input)
-    assert_equal 123, dict.foo
-  end
-
   def test_parse_is_another_spelling_of_load
-    input = { foo: 123 }
+    input = { foo: 123 }.to_json
     dict = class_under_test.parse(input)
     assert_equal 123, dict.foo
   end
@@ -46,15 +34,6 @@ class TestDictionary < Minitest::Test
         bing: 456
         bong: 789
     YAML
-    dict = class_under_test.load(input)
-    assert_equal(123, dict.foo)
-    assert_equal(456, dict.bar.bing)
-    assert_equal(789, dict.bar.bong)
-    assert_raises(NoMethodError) { dict.baz }
-  end
-
-  def test_nested_keys_in_openstruct
-    input = OpenStruct.new(foo: 123, bar: { bing: 456, bong: 789 })
     dict = class_under_test.load(input)
     assert_equal(123, dict.foo)
     assert_equal(456, dict.bar.bing)
@@ -81,11 +60,6 @@ class TestDictionary < Minitest::Test
 
   def test_throws_argument_error_on_invalid_json
     input = "{invalid"
-    assert_raises(ArgumentError) { class_under_test.load(input) }
-  end
-
-  def test_throws_argument_error_on_ruby_hash_that_doesnt_make_openstruct
-    input = { [1] => "invalid key" }
     assert_raises(ArgumentError) { class_under_test.load(input) }
   end
 end

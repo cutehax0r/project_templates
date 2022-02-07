@@ -15,6 +15,8 @@ module ClassUnderTest
   # `TestFoobar` to `ProjectTemplates::Foobar`. At least for the moment a more
   # complicated helper is not required, just "include it into your test file"
   # to make it available.
+  # TODO: make smarter: aware of namespaces. Walk up to test/ then prepend the
+  # default namespace, swap / with :: and to 'camelcase stuff'
   def class_under_test
     return @class_under_test if defined?(@class_under_test)
 
@@ -22,6 +24,37 @@ module ClassUnderTest
     test_name = self.class.to_s
     full_class_name = [namespace, test_name[4..]].join("::")
     @class_under_test = Kernel.const_get(full_class_name)
+  end
+end
+
+module FileHelper
+  # A simple helper that builds paths that represent files in the fixture path.
+  # it saves a bit of typing and makes the files a bit shorter
+  def file(name, absolute: true, exist: true)
+    path = Pathname.new(Dir.pwd).join("test/fixtures/files").join(name)
+    message = "File #{name} exists where it should not. Found at #{path}" if !exist && path.exist?
+    message = "File #{name} does not exist where it should. Expected at #{path}" if exist && !path.exist?
+    raise(ArgumentError, message) if message
+
+    path = path.expand_path if absolute
+    path.to_s
+  end
+end
+
+module MockEnv
+  # A helper to mock environment variables.
+  # * delete remove keys from the environment
+  # * new_env is a hash that ADDS or REPLACES keys in the environment
+  # Requires a block which is executed inside the mocked environment
+  # ENV can be modified within the block as it is restored to once
+  # the block returns.
+  def mock_env(delete: [], **new_env, &block)
+    original_env = ENV.to_h
+    ENV.update(new_env.transform_keys(&:to_s).transform_keys(&:upcase).transform_values(&:to_s))
+    [*delete].map(&:to_s).map(&:upcase).each { ENV.delete(_1) }
+    yield(block)
+  ensure
+    ENV.replace(original_env)
   end
 end
 
