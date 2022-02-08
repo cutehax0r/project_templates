@@ -5,6 +5,10 @@ require "sorbet-runtime"
 
 module ProjectTemplates
   module Sources
+    # Always returns an empty dictionary. Because no external data is needed
+    # you can be sure this always works. Use this as the lowest priority
+    # source in a dictionary loader to ensure you always get back an
+    # empty dictionary rather than 'nil'.
     class Empty
       extend T::Sig
       include DictionarySource
