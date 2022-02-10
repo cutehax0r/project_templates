@@ -7,7 +7,6 @@ class TestString < MiniTest::Test
   attr_reader :json, :source
 
   def setup
-    @class_under_test = ProjectTemplates::Sources::String
     @json = { hello: "world" }.to_json
     @source = class_under_test.new(json)
   end

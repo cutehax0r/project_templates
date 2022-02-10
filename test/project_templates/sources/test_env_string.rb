@@ -9,7 +9,6 @@ class TestEnvString < MiniTest::Test
   attr_reader :json, :source
 
   def setup
-    @class_under_test = ProjectTemplates::Sources::EnvString
     @source = class_under_test.new("SOME_ENV")
   end
 

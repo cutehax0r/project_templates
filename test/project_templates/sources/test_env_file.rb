@@ -10,7 +10,6 @@ class TestEnvFile < MiniTest::Test
   attr_reader :json, :source
 
   def setup
-    @class_under_test = ProjectTemplates::Sources::EnvFile
     @source = mock_env(delete: "SOME_ENV") { class_under_test.new("SOME_ENV") }
   end
 
