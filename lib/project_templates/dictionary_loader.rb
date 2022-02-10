@@ -34,7 +34,7 @@ module ProjectTemplates
     # where lower index is higher priority.
     def initialize(*sources)
       @sources = T.let(sources.to_a, T::Array[DictionarySource])
-      @loadable_sources = T.let([], T.nilable(T::Array[DictionarySource]))
+      @loadable_sources = T.let(nil, T.nilable(T::Array[DictionarySource]))
       @loaded_source = T.let(nil, T.nilable(DictionarySource))
       @dictionary = T.let(nil, T.nilable(Dictionary))
     end
