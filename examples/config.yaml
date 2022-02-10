@@ -1,0 +1,17 @@
+---
+name: Cute HaX0r
+email: project_templates@cutehax0r.com
+
+variables:
+  foo_string: This is a string
+  foo_int: 123
+  foo_bool: true
+  foo_float: 4.56
+  foo_array:
+    - an array
+    - of strings
+  foo_hash:
+    bar_string: this is a nested string
+    bar_int: 789
+    bar_float: 0.1
+
