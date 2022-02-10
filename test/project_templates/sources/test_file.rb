@@ -10,7 +10,6 @@ class TestFile < MiniTest::Test
   attr_reader :json, :source
 
   def setup
-    @class_under_test = ProjectTemplates::Sources::File
     @source = class_under_test.new(file("valid.yaml", exist: true))
   end
 

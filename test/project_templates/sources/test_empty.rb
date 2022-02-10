@@ -7,7 +7,6 @@ class TestEmpty < MiniTest::Test
   attr_reader :source
 
   def setup
-    @class_under_test = ProjectTemplates::Sources::Empty
     @source = class_under_test.new
   end
 

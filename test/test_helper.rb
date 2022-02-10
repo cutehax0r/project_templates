@@ -15,14 +15,19 @@ module ClassUnderTest
   # `TestFoobar` to `ProjectTemplates::Foobar`. At least for the moment a more
   # complicated helper is not required, just "include it into your test file"
   # to make it available.
-  # TODO: make smarter: aware of namespaces. Walk up to test/ then prepend the
-  # default namespace, swap / with :: and to 'camelcase stuff'
   def class_under_test
     return @class_under_test if defined?(@class_under_test)
 
-    namespace = "ProjectTemplates"
-    test_name = self.class.to_s
-    full_class_name = [namespace, test_name[4..]].join("::")
+    class_name = self.class.name.to_sym
+    file = Pathname.new(Object.const_source_location(class_name).first)
+    base_path = Pathname.new(Dir.pwd)
+    relative = file.relative_path_from(base_path)
+
+    # This is a bad version of ActiveSupport tools for transforming strings to
+    # ruby classes, constants, namespaces, etc.
+    namespace = relative.dirname.to_s.split("/")[1..].map { _1.split("_").map(&:capitalize).join }.join("::")
+
+    full_class_name = [namespace, class_name.to_s[4..]].join("::")
     @class_under_test = Kernel.const_get(full_class_name)
   end
 end
