@@ -14,6 +14,7 @@ require_relative "project_templates/sources/env_string"
 require_relative "project_templates/sources/env_file"
 require_relative "project_templates/config"
 require_relative "project_templates/config_paths"
+require_relative "project_templates/config_variables"
 require_relative "project_templates/version"
 
 module ProjectTemplates
