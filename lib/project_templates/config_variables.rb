@@ -11,9 +11,9 @@ module ProjectTemplates
 
     sig do
       params(
-        project_variables: T.nilable(Dictionary),
-        global_variables: T.nilable(Dictionary),
-        run_variables: T.nilable(Dictionary)
+        project: T.nilable(Dictionary),
+        global: T.nilable(Dictionary),
+        run: T.nilable(Dictionary)
       ).void
     end
     # Pass in the three sets of variables and this will give you back a
@@ -22,14 +22,35 @@ module ProjectTemplates
     #   * global variables are less important than
     #   * run variables
     def initialize(
-      project_variables: nil,
-      global_variables: nil,
-      run_variables: nil
+      project: nil,
+      global: nil,
+      run: nil
     )
-      default_dictionary = DEFAULT_DICTIONARY_LOADER.new.load
-      @project_variables = project_variables || default_dictionary
-      @global_variables = global_variables || default_dictionary
-      @run_variables = run_variables || default_dictionary
+      default = Sources::Empty.new.load
+      @project = T.let(project || default, Dictionary)
+      @global = T.let(global || default, Dictionary)
+      @run = T.let(run || default, Dictionary)
+    end
+
+    sig { returns(Dictionary) }
+    # the lowest level variables
+    attr_accessor :project
+
+    sig { returns(Dictionary) }
+    # the medium level variables
+    attr_accessor :global
+
+    sig { returns(Dictionary) }
+    # the highest level variables
+    attr_accessor :run
+
+    sig { returns(Dictionary) }
+    # applies the overriding rules.
+    def dictionary
+      @dictionary ||= begin
+        dictionary_sum project.to_h.merge(global.to_h).merge(run.to_h)
+        Dictionary.new(dictionary_sum)
+      end
     end
   end
 end
