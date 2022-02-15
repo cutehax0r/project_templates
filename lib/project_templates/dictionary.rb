@@ -15,11 +15,18 @@ module ProjectTemplates
   # in the event you really want an ordinary Hash instead of an openstruct you
   # can always call `.table` on a key to get it's value as a hash with
   # symbolized keys.
-  class Dictionary < SimpleDelegator
+  class Dictionary
     extend T::Sig
-    # New is made private to ensure only a valid `OpenStruct` is passed to the class
-    # constructor and delegation works as expected.
-    private_class_method :new
+
+    PARSE_OPTS = T.let(
+      {
+        max_nesting: 5,
+        allow_nan: false,
+        symbolize_names: true,
+        object_class: Hash,
+      },
+      T::Hash[Symbol, T.any(Integer, T::Boolean, Object)]
+    )
 
     class << self
       extend T::Sig
@@ -33,25 +40,38 @@ module ProjectTemplates
       def load(input)
         yaml_input = YAML.safe_load(input)
         json_input = yaml_input.to_json
-        openstruct_input = JSON.parse(json_input, object_class: OpenStruct)
-
-        raise(ArgumentError, "Input did not produce a dictionary") unless openstruct_input.is_a?(OpenStruct)
-
-        new(openstruct_input)
-      rescue JSON::JSONError, Psych::Exception => e
-        raise(ArgumentError, e.to_s)
+        new(json_input)
       end
+    end
 
-      alias parse load
+    sig { params(source: String).void }
+    # expects source to be JSON, instantiates the dictionary using it.
+    def initialize(source)
+      @hash = T.let(JSON.parse(source, PARSE_OPTS), T::Hash[Symbol, T.untyped])
+      @struct = T.let(JSON.parse(source, PARSE_OPTS.merge(object_class: OpenStruct)), OpenStruct)
+    rescue JSON::JSONError, Psych::Exception, TypeError => e
+      raise(ArgumentError, e.to_s)
+    end
+
+    sig { params(method: T.any(String, Symbol), _include_private: T.untyped).returns(T.untyped) }
+    def respond_to_missing?(method, _include_private = false)
+      @struct.respond_to?(method) || super
+    end
+
+    sig do
+      params(
+        method: T.any(String, Symbol),
+        _args: T.nilable(T::Array[T.untyped]),
+        _block: T.nilable(T.proc.void)
+      ).returns(T.untyped)
+    end
+    def method_missing(method, *_args, &_block)
+      @struct.respond_to?(method) ? @struct.send(method) : super
     end
 
     sig { returns(T::Hash[Symbol, T.untyped]) }
-    # converts the dictionary into a ruby hash with symbolized keys. Values are
-    # either int, float, bool, hash, array but to avoid a nightmare of sorbet
-    # config I'm just going to say it's untyped
     def to_h
-      t = ->(v) { v.is_a?(OpenStruct) ? v.table.transform_values { t[_1] } : v }
-      t[@delegate_sd_obj]
+      @hash
     end
   end
 end
