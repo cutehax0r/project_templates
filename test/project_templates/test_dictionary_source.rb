@@ -77,11 +77,12 @@ class TestDictionarySource < MiniTest::Test
   end
 
   def test_load_source_called_if_loadable
-    loader = Minitest::Mock.new.expect(:load!, true)
+    dictionary = Minitest::Mock.new(ProjectTemplates::Dictionary.new("{}"))
+    loader = Minitest::Mock.new.expect(:load!, dictionary)
     source.define_singleton_method(:loadable?) { true }
     source.define_singleton_method(:load_source) { loader.load! }
-    # TODO: source.load
-    # TODO loader.verify
+    source.load
+    loader.verify
   end
 
   def test_load_source_not_called_if_not_loadable
@@ -89,7 +90,7 @@ class TestDictionarySource < MiniTest::Test
     source.define_singleton_method(:load_source) do
       raise(MethodError, "unloadable source should not call load_source")
     end
-    # TODO: assert(source.load)
+    refute(source.load)
   end
 
   def test_load_source_not_called_if_loaded
