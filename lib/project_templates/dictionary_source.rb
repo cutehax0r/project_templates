@@ -35,7 +35,7 @@ module ProjectTemplates
       !dictionary.eql?(nil)
     end
 
-    sig { T.nilable(Dictionary) }
+    sig { returns(T.nilable(Dictionary)) }
     # if loadable, try to create a dictionary from from the source
     def load
       @dictionary = load_source if loadable? && !loaded?

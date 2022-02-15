@@ -27,9 +27,10 @@ module ProjectTemplates
       run: nil
     )
       default = Sources::Empty.new.load
-      @project = T.let(project || default, Dictionary)
-      @global = T.let(global || default, Dictionary)
-      @run = T.let(run || default, Dictionary)
+      @project = T.let(T.must(project || default), Dictionary)
+      @global = T.let(T.must(global || default), Dictionary)
+      @run = T.let(T.must(run || default), Dictionary)
+      @dictionary = T.let(build_dictionary, Dictionary)
     end
 
     sig { returns(Dictionary) }
@@ -45,12 +46,17 @@ module ProjectTemplates
     attr_accessor :run
 
     sig { returns(Dictionary) }
-    # applies the overriding rules.
-    def dictionary
-      @dictionary ||= begin
-        dictionary_sum project.to_h.merge(global.to_h).merge(run.to_h)
-        Dictionary.new(dictionary_sum)
-      end
+    # the aggregate dictionary
+    attr_accessor :dictionary
+
+    private
+
+    sig { returns(Dictionary) }
+    # does the work of building a dictionary from run, project, and global variables
+    def build_dictionary
+      # pro glob run
+      @global.to_h.merge(@global.to_h)
+      @global
     end
   end
 end

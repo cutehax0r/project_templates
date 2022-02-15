@@ -16,6 +16,7 @@ module ProjectTemplates
   # can always call `.table` on a key to get it's value as a hash with
   # symbolized keys.
   class Dictionary < SimpleDelegator
+    extend T::Sig
     # New is made private to ensure only a valid `OpenStruct` is passed to the class
     # constructor and delegation works as expected.
     private_class_method :new
@@ -42,6 +43,15 @@ module ProjectTemplates
       end
 
       alias parse load
+    end
+
+    sig { returns(T::Hash[Symbol, T.untyped]) }
+    # converts the dictionary into a ruby hash with symbolized keys. Values are
+    # either int, float, bool, hash, array but to avoid a nightmare of sorbet
+    # config I'm just going to say it's untyped
+    def to_h
+      t = ->(v) { v.is_a?(OpenStruct) ? v.table.transform_values { t[_1] } : v }
+      t[@delegate_sd_obj]
     end
   end
 end

@@ -9,8 +9,8 @@ module ProjectTemplates
   class ConfigPaths
     extend T::Sig
 
-    DEFAULT_TEMPLATE = T.let(Pathname.new("~/.share/project_templates/").expand_path.to_s, String)
-    DEFAULT_WORKING = T.let(Pathname.new(Dir.pwd).expand_path.to_s, String)
+    DEFAULT_TEMPLATE = T.let(Pathname.new("~/.share/project_templates/").expand_path, Pathname)
+    DEFAULT_WORKING = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
 
     sig do
       params(
@@ -25,15 +25,15 @@ module ProjectTemplates
     def initialize(
       project_name:,
       target_name:,
-      template_path: DEFAULT_TEMPLATE,
-      working_path: DEFAULT_WORKING
+      template_path: DEFAULT_TEMPLATE.to_s,
+      working_path: DEFAULT_WORKING.to_s
     )
       @project_name = project_name
       @target_name = target_name
-      @template = Pathname.new(template_path || DEFAULT_TEMPLATE).expand_path
-      @working = Pathname.new(working_path || DEFAULT_WORKING).expand_path
-      @project = Pathname.new(template).join(project_name).expand_path
-      @target = Pathname.new(working).join(target_name).expand_path
+      @template = T.let(Pathname.new(template_path).expand_path, Pathname)
+      @working = T.let(Pathname.new(working_path).expand_path, Pathname)
+      @project = T.let(Pathname.new(template).join(project_name).expand_path, Pathname)
+      @target = T.let(Pathname.new(working).join(target_name).expand_path, Pathname)
       @errors = T.let([], T::Array[String])
       valid?
     end
@@ -42,14 +42,14 @@ module ProjectTemplates
     # are all the paths valid readable / writable locations?
     def valid?
       @errors.clear
-      @errors << ("template path cannot be read") unless @template.readable?
-      @errors << ("project path cannot be read") unless @project.readable?
-      @errors << ("working directory cannot be written to") unless @working.writable?
-      @errors << ("target directory already exists") if @target.writable?
+      @errors << "template path cannot be read" unless @template.readable?
+      @errors << "project path cannot be read" unless @project.readable?
+      @errors << "working directory cannot be written" unless @working.writable?
+      @errors << "target directory already exists" if @target.writable?
       @errors.any?
     end
 
-    sig { returns(T::Array(String)) }
+    sig { returns(T::Array[String]) }
     # Errors that happen after validation
     attr_reader :errors
 
@@ -68,7 +68,7 @@ module ProjectTemplates
     sig { returns(String) }
     # the path where the target for the project template will be built
     def working
-      @workign.to_s
+      @working.to_s
     end
 
     sig { returns(String) }
