@@ -2,13 +2,13 @@
 
 require "test_helper"
 
-class TestConfigVariables < MiniTest::Test
+class TestConfigPaths < MiniTest::Test
   extend HasAttributeHelper
   include ClassUnderTest
 
-  attr_reader :vars
+  attr_reader :paths
 
   def setup
-    @vars = class_under_test.new
+    @paths = class_under_test.new
   end
 end
