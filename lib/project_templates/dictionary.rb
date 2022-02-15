@@ -36,11 +36,13 @@ module ProjectTemplates
       # parser to produce an `OpenStruct` then everything is fine. Some valid JSON
       # and YAML will not produce a dictionary. E.g. "[1, 2, 3]" is valid for
       # both JSON and YAML but parses to an `Array`. Invalid JSON will also cause
-      # an error. If a valid `OpenStruct` cannot be formed `ArgumentError` is raised.
+      # an error. If a valid `apenStruct` cannot be formed `ArgumentError` is raised.
       def load(input)
         yaml_input = YAML.safe_load(input)
         json_input = yaml_input.to_json
         new(json_input)
+      rescue Psych::Exception => e
+        raise(ArgumentError, e.to_s)
       end
     end
 
@@ -58,13 +60,7 @@ module ProjectTemplates
       @struct.respond_to?(method) || super
     end
 
-    sig do
-      params(
-        method: T.any(String, Symbol),
-        _args: T.nilable(T::Array[T.untyped]),
-        _block: T.nilable(T.proc.void)
-      ).returns(T.untyped)
-    end
+    sig { params(method: T.any(String, Symbol), _args: T.untyped, _block: T.untyped).returns(T.untyped) }
     def method_missing(method, *_args, &_block)
       @struct.respond_to?(method) ? @struct.send(method) : super
     end
