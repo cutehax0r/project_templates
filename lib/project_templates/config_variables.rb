@@ -54,9 +54,8 @@ module ProjectTemplates
     sig { returns(Dictionary) }
     # does the work of building a dictionary from run, project, and global variables
     def build_dictionary
-      # pro glob run
-      @global.to_h.merge(@global.to_h)
-      @global
+      merged_values = project.to_h.merge(global.to_h).merge(run.to_h)
+      Dictionary.load(merged_values.to_json)
     end
   end
 end
