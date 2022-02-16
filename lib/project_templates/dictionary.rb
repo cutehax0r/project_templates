@@ -36,7 +36,7 @@ module ProjectTemplates
       # parser to produce an `OpenStruct` then everything is fine. Some valid JSON
       # and YAML will not produce a dictionary. E.g. "[1, 2, 3]" is valid for
       # both JSON and YAML but parses to an `Array`. Invalid JSON will also cause
-      # an error. If a valid `apenStruct` cannot be formed `ArgumentError` is raised.
+      # an error. If a valid `OpenStruct` cannot be formed `ArgumentError` is raised.
       def load(input)
         yaml_input = YAML.safe_load(input)
         json_input = yaml_input.to_json
@@ -56,16 +56,23 @@ module ProjectTemplates
     end
 
     sig { params(method: T.any(String, Symbol), _include_private: T.untyped).returns(T.untyped) }
+    # As methods are delegated to the backing openstruct, this will ensure that
+    # behaviour for things like "respond_to?" and "method()" work as expected
     def respond_to_missing?(method, _include_private = false)
       @struct.respond_to?(method) || super
     end
 
     sig { params(method: T.any(String, Symbol), _args: T.untyped, _block: T.untyped).returns(T.untyped) }
+    # methods on the dictionary are passed to the openstruct containing all of
+    # the data. Accessing a key that is not defined raises the expected NoMethodError
+    # rather than silently returning nil.
     def method_missing(method, *_args, &_block)
       @struct.respond_to?(method) ? @struct.send(method) : super
     end
 
     sig { returns(T::Hash[Symbol, T.untyped]) }
+    # Returns the dictionary as a ruby hash. Useful for merging dictionaries or
+    # iterating over key-value pairs
     def to_h
       @hash
     end
