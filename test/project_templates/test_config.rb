@@ -48,6 +48,7 @@ class TestConfig < MiniTest::Test
   end
 
   def test_initialize_can_be_provided_all_arguments
+    # mocking and #== don't play well together
     args = {
       dry_run: true,
       template_path: Pathname.new("/").expand_path,
@@ -56,9 +57,9 @@ class TestConfig < MiniTest::Test
       working_path: Pathname.new("/").expand_path,
       project_name: "new_project",
       target_name: "some_target",
-      project_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load("{}")),
-      global_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load("{}")),
-      run_variables: Minitest::Mock.new(ProjectTemplates::Dictionary.load("{}")),
+      project_variables: ProjectTemplates::Dictionary.load("{}"),
+      global_variables: ProjectTemplates::Dictionary.load("{}"),
+      run_variables: ProjectTemplates::Dictionary.load("{}"),
     }
     inited_config = class_under_test.new(**args)
     args.each do |argument, expected_value|

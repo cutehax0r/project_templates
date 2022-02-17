@@ -61,7 +61,8 @@ class TestDictionaryLoader < Minitest::Test
     source1.expect(:loaded?, false)
     source1.expect(:dictionary, nil)
 
-    dictionary = Minitest::Mock.new(ProjectTemplates::Dictionary.load({ foo: :bar }.to_json))
+    # can't be mocked because minitest doesn't do #==
+    dictionary = ProjectTemplates::Dictionary.load({ foo: :bar }.to_json)
     source2 = Minitest::Mock.new(ProjectTemplates::Sources::Empty.new)
     source2.expect(:loadable?, true)
     source2.expect(:loaded?, true)
@@ -110,7 +111,8 @@ class TestDictionaryLoader < Minitest::Test
   end
 
   def test_dicionary_is_loaded_sources_dictionary
-    dictionary = Minitest::Mock.new(ProjectTemplates::Dictionary.load({ foo: :bar }.to_json))
+    # can't be mocked because minitest doesn't do #==
+    dictionary = ProjectTemplates::Dictionary.load({ foo: :bar }.to_json)
     source = Minitest::Mock.new(ProjectTemplates::Sources::Empty.new)
     source.expect(:loadable?, true)
     source.expect(:dictionary, dictionary)

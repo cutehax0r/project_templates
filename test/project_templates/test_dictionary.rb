@@ -10,20 +10,33 @@ class TestDictionary < Minitest::Test
       ---
       foo: 123
     YAML
-    dict = class_under_test.load(input)
-    assert_equal 123, dict.foo
+    class_under_test.load(input)
   end
 
   def test_loads_with_json
     input = '{"foo": 123}'
-    dict = class_under_test.load(input)
-    assert_equal 123, dict.foo
+    class_under_test.load(input)
   end
 
-  def test_parse_is_another_spelling_of_load
-    input = { foo: 123 }.to_json
-    dict = class_under_test.parse(input)
-    assert_equal 123, dict.foo
+  def test_implements_method_missing
+    input = '{"foo": 123}'
+    dict = class_under_test.new(input)
+    assert_equal(123, dict.foo)
+    assert_raises(NoMethodError) { dict.bar }
+  end
+
+  def test_implemements_respond_to_missing
+    input = '{"foo": 123}'
+    dict = class_under_test.new(input)
+    assert(dict.respond_to?(:foo))
+    refute(dict.respond_to?(:bar))
+    assert_instance_of(Method, dict.method(:foo))
+    assert_raises(NameError) { dict.method(:bar) }
+  end
+
+  def test_initializes_with_json
+    input = '{"foo": 123}'
+    class_under_test.new(input)
   end
 
   def test_nested_keys_in_yaml
@@ -41,25 +54,24 @@ class TestDictionary < Minitest::Test
     assert_raises(NoMethodError) { dict.baz }
   end
 
-  def test_new_is_private
-    assert_raises(NoMethodError) { class_under_test.new }
-  end
-
   def test_throws_argument_error_on_yaml_that_doesnt_make_a_hash
     input = <<~YAML
       ---
       - foo
     YAML
     assert_raises(ArgumentError) { class_under_test.load(input) }
+    assert_raises(ArgumentError) { class_under_test.new(input) }
   end
 
   def test_throws_argument_error_on_json_that_doesnt_make_a_hash
     input = "[1, 2, 3]"
     assert_raises(ArgumentError) { class_under_test.load(input) }
+    assert_raises(ArgumentError) { class_under_test.new(input) }
   end
 
   def test_throws_argument_error_on_invalid_json
     input = "{invalid"
     assert_raises(ArgumentError) { class_under_test.load(input) }
+    assert_raises(ArgumentError) { class_under_test.new(input) }
   end
 end

@@ -7,6 +7,12 @@ AllCops:
   TargetRubyVersion: 3.1
 
 Metrics/AbcSize:
+  IgnoredMethods:
+    - initialize
+  Exclude:
+    - "test/**/*"
+
+Metrics/ClassLength:
   Exclude:
     - "test/**/*"
 

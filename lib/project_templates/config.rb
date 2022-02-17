@@ -59,7 +59,6 @@ module ProjectTemplates
     # template_path to produce project_path
     attr_accessor :project_name
 
-    # TODO: attr_accessor  :user_variables, :project_variables, :run_variables
     sig { returns(Dictionary) }
     # Global variables are read from a configuration file and will override
     # project variables when a conflict occurs. Global variables can in turn be
