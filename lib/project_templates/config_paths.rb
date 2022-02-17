@@ -9,7 +9,8 @@ module ProjectTemplates
   class ConfigPaths
     extend T::Sig
 
-    DEFAULT_TEMPLATE = T.let(Pathname.new("~/.share/project_templates/").expand_path, Pathname)
+    # TODO: Maybe these should be lambdas so they resolve at run time not parse time
+    DEFAULT_TEMPLATE = T.let(Pathname.new("~/.share/project_templates").expand_path, Pathname)
     DEFAULT_WORKING = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
 
     sig do
@@ -32,8 +33,8 @@ module ProjectTemplates
       @target_name = target_name
       @template = T.let(Pathname.new(template_path).expand_path, Pathname)
       @working = T.let(Pathname.new(working_path).expand_path, Pathname)
-      @project = T.let(Pathname.new(template).join(project_name).expand_path, Pathname)
-      @target = T.let(Pathname.new(working).join(target_name).expand_path, Pathname)
+      @project = T.let(@template.join(project_name).expand_path, Pathname)
+      @target = T.let(@working.join(target_name).expand_path, Pathname)
       @errors = T.let([], T::Array[String])
       valid?
     end
@@ -46,7 +47,7 @@ module ProjectTemplates
       @errors << "project path cannot be read" unless @project.readable?
       @errors << "working directory cannot be written" unless @working.writable?
       @errors << "target directory already exists" if @target.writable?
-      @errors.any?
+      @errors.empty?
     end
 
     sig { returns(T::Array[String]) }
