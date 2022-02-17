@@ -7,16 +7,17 @@ class TestApp < MiniTest::Test
   attr_reader :app
 
   def setup
-    @app = class_under_test.new(MiniTest::Mock.new(ProjectTemplates::Config.new))
+    config = ProjectTemplates::Config.new(
+      project: "foo",
+      target: "bar",
+      variables: ProjectTemplates::ConfigVariables.new,
+      paths: ProjectTemplates::ConfigPaths.new(project_name: "foo", target_name: "bar")
+    )
+    @app = class_under_test.new(config)
   end
 
   def test_can_be_run
     assert_respond_to(app, :run)
-  end
-
-  def test_can_be_initialized_with_a_config
-    config = MiniTest::Mock.new(ProjectTemplates::Config.new)
-    class_under_test.new(config)
   end
 
   def test_prints_hello
