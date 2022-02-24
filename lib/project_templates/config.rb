@@ -1,16 +1,47 @@
 # frozen_string_literal: true
 # typed: strict
 
+require "optparse"
 require "sorbet-runtime"
 
 module ProjectTemplates
-  # Provides all of the unique configuration for the application. The
-  # attributes allow both getting and setting of configuration values so
-  # that a Configuration can be built "on the fly" Class methods to
-  # instantiate a configuration using defaults simplify getting a config
-  # ready to use.
   class Config
     extend T::Sig
+
+    sig { params(args: T::Array[String]).returns(T.attached_class) }
+    # given argv, parse that into a config
+    def self.parse(args)
+      opts = {}
+      project, target = option_parser.parse!(args, into: opts)
+      new(
+        project: project.to_s, target: target.to_s,
+        action: set_action(project, target, opts),
+        path_templates: opts[:path_templates].to_s,
+        path_target: opts[:path_target].to_s,
+        path_project: opts[:path_project].to_s,
+        variables: opts[:variables].to_s
+      )
+    end
+
+    sig { params(project: T.untyped, target: T.untyped, opts: T.untyped).returns(Symbol) }
+    def self.set_action(project, target, opts)
+      return :help if opts[:help]
+      return :version if opts[:version]
+      return :list if opts[:list]
+      return :create if project && target
+
+      :help
+    end
+
+    sig { returns(OptionParser) }
+    def self.option_parser
+      OptionParser.new do |opts|
+        opts.banner = "Usage: project_templates project template [options]"
+        opts.on("-h", "--help", "print help")
+        opts.on("-v", "--version", "print version help")
+        opts.on("-l", "--list", "show all templates")
+      end
+    end
 
     sig { returns(String) }
     # name of the template to use
@@ -20,37 +51,46 @@ module ProjectTemplates
     # name of the new templated project
     attr_accessor :target
 
-    sig { returns(ConfigVariables) }
-    # a container for all of the variable sets
-    attr_accessor :variables
+    sig { returns(Symbol) }
+    # the action
+    attr_accessor :action
 
-    sig { returns(ConfigPaths) }
-    # a container holding all the important paths
-    attr_accessor :paths
+    sig { returns(String) }
+    # the path to templates
+    attr_accessor :path_templates
+
+    sig { returns(String) }
+    # the path to write to
+    attr_accessor :path_target
+
+    sig { returns(String) }
+    # the path to read from
+    attr_accessor :path_project
+
+    sig { returns(String) }
+    # the variables
+    attr_accessor :variables
 
     sig do
       params(
         project: String,
         target: String,
-        paths: ConfigPaths,
-        variables: ConfigVariables
+        action: Symbol,
+        path_templates: String,
+        path_target: String,
+        path_project: String,
+        variables: String
       ).void
     end
-    # Initialize a config by explicitly setting all of the values. If you
-    # don't want to set all values consider using one of the class methods
-    # instead. Paths and Variables should probably become objects but for
-    # now the rubocop rule about param lists will be ignored
-    def initialize(project:, target:, paths:, variables:)
+    # do the init
+    def initialize(project:, target:, action:, path_templates:, path_target:, path_project:, variables:) # rubocop:disable Metrics/ParameterLists
       @project = project
       @target = target
-      @paths = paths
+      @action = action
+      @path_templates = path_templates
+      @path_target = path_target
+      @path_project = path_project
       @variables = variables
-    end
-
-    sig { returns(Dictionary) }
-    # expose the computed dictionary of variables at a convenient location
-    def vars
-      variables.dictionary
     end
   end
 end

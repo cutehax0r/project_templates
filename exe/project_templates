@@ -5,13 +5,4 @@
 require "project_templates"
 require "sorbet-runtime"
 
-module ProjectTemplates
-  project = "foo"
-  target = "bar"
-  variables = ConfigVariables.new
-  paths = ConfigPaths.new(project_name: project, target_name: target)
-  config = ProjectTemplates::Config.new(project:, target:, variables:, paths:)
-
-  app = App.new(config)
-  app.run
-end
+ProjectTemplates::App.configure(ARGV).run

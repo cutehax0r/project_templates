@@ -32,6 +32,10 @@ Layout/LineLength:
 Style/Documentation:
   Enabled: false
 
+Style/HashSyntax:
+  Enabled: false
+  # This doesn't work with sorbet
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes

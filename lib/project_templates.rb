@@ -4,18 +4,13 @@
 require "sorbet-runtime"
 
 require_relative "project_templates/app"
-require_relative "project_templates/dictionary"
-require_relative "project_templates/dictionary_source"
-require_relative "project_templates/dictionary_loader"
-require_relative "project_templates/sources/empty"
-require_relative "project_templates/sources/file"
-require_relative "project_templates/sources/string"
-require_relative "project_templates/sources/env_string"
-require_relative "project_templates/sources/env_file"
 require_relative "project_templates/config"
-require_relative "project_templates/config_paths"
-require_relative "project_templates/config_variables"
 require_relative "project_templates/version"
+require_relative "project_templates/actions/action"
+require_relative "project_templates/actions/create"
+require_relative "project_templates/actions/help"
+require_relative "project_templates/actions/list"
+require_relative "project_templates/actions/version"
 
 module ProjectTemplates
   extend T::Sig

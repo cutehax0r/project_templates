@@ -4,32 +4,27 @@
 require "sorbet-runtime"
 
 module ProjectTemplates
-  # This responsible for doing all the work of the application. Once
-  # configured you run the application and it'll run according to the
-  # configuration. Note that there is going to be a separate CLIApplication
-  # class that handles setting-up the application and running it. That CLI
-  # will handle command line argument parsing displaying help, etc. This is
-  # so that the App class can be used by a graphical interface or even a
-  # web-app in the future.
+  # do all the work
   class App
     extend T::Sig
 
-    sig { params(config: Config).void }
-    # Setup a config argument with paths and variables. Pass that to the
-    # initializer. Once that's done you can call "run".
-    def initialize(config)
+    sig { params(args: T.untyped, parser: T.untyped, actions: T.untyped).returns(T.attached_class) }
+    def self.configure(args = ARGV, parser: Config, actions: Actions)
+      config = parser.parse(args)
+      new(config, actions: actions)
+    end
+
+    sig { params(config: T.untyped, actions: T.untyped).void }
+    def initialize(config, actions: Actions)
       @config = config
+      @actions = actions
     end
 
     sig { void }
-    # The main entry point of the application. Instantiate the application
-    # passing arguments and then call "run" to make it work. Execution
-    # options can be set before calling run in order to configure the
-    # application.
-    # The configuration will be checked and verified and then a new project
-    # will be created.
     def run
-      puts "Hello"
+      action = @actions.const_get(@config.action.to_s.capitalize.to_sym).new(@config)
+      action.run
+      puts action.errors if action.failure?
     end
   end
 end

@@ -11,10 +11,6 @@ class TestProjectTemplates < MiniTest::Test
     refute_nil(ProjectTemplates::Config)
   end
 
-  def test_has_a_dictionary
-    refute_nil(ProjectTemplates::Dictionary)
-  end
-
   def test_has_a_version
     refute_nil(ProjectTemplates::VERSION)
   end
