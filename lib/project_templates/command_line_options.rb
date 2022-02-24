@@ -1,80 +1,67 @@
 # frozen_string_literal: true
-# typed: strict
+# typed: false
 
+require "optparse"
 require "sorbet-runtime"
 
 module ProjectTemplates
-  # Defines command line arguments, parses them into "useful" values
-  # and prepares them to be used to create a configuration object
   class CommandLineOptions
     extend T::Sig
 
-    sig { returns(String) }
-    # the name of the project that will be created
-    attr_accessor :target
+    attr_reader :opts
 
-    sig { returns(String) }
-    # the name of the project that will be used as a template. Directory
-    # relataive to templates_directory
-    attr_accessor :project
+    class << self
+      extend T::Sig
 
-    sig { returns(String) }
-    # path to the config file to use for global options
-    attr_accessor :config_file
+      def parse # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+        arguments = {}
+        parser = OptionParser.new do |p|
+          p.banner = "Project Templates"
+          p.separator("")
+          p.on("-h", "--help", nil, "Show the help")
+          p.on("-v", "--version", nil, "Display the version")
+          p.on("-k", "--health-check", nil, "Check the application configuration")
+          p.on("-l", "--list", nil, "Show all createable projects")
+          p.on("-y", "--verify", nil, "Perform all actions that don't modify the file system")
+          p.on("-n", "--no-scripts", nil, "Don't run any scripts defined in the project")
+          p.on("-fFILE", "--file=FILE", String, "Path to config file")
+          p.on("-tTEMPLATES", "--templates=TEMPLATES", String, "Path to template directory")
+          p.on("-wWORKING", "--working=WORKING", String, "Path to create new project in")
+          p.on("-pPROJECT", "--project=PROJECT", String, "Path to specific project template")
+          p.on("-dDESTINATION", "--destination=DESTINATION", String, "Path for target directory of new project")
+          p.on("-a", "--variables", String, "Variables that override global config")
+        end
+        project, target = parser.parse!(into: arguments)
+        arguments[:project] = project
+        arguments[:target] = target
+        arguments[:action] = action_for_opts(arguments)
+        new(**arguments)
+      end
 
-    sig { returns(String) }
-    # path to the create the project in
-    attr_accessor :working_directory
+      def action_for_opts(opts)
+        return :help if opts[:target].nil? || opts[:project].nil? || opts[:help]
+        return :version if opts[:version]
+        return :health_check if opts[:health_check]
+        return :list if opts[:list]
+        return :verify if opts[:verify]
 
-    sig { returns(String) }
-    # path to the create the project in
-    attr_accessor :template_directory
-
-    sig { returns(String) }
-    # path to use for project directory. Used in place of computed one inside
-    # of target_directory
-    attr_accessor :project_directory
-
-    sig { returns(String) }
-    # path to use for for created project. Used in place of computed one
-    # inside of working_directory
-    attr_accessor :target_directory
-
-    sig { returns(String) }
-    # explicitly provided variables
-    attr_accessor :variables
-
-    sig { returns(String) }
-    # Action for the application to take - should probably be an enum
-    attr_accessor :action
-
-    sig { void }
-    def initialize
-      @target = ""
-      @project = ""
-      @config_file = ""
-      @working_directory = ""
-      @template_directory = ""
-      @project_directory = ""
-      @target_directory = ""
-      @variables = ""
-      @action = ""
+        :create_project
+      end
     end
 
-    sig { params(_arguments: T::Array[String]).void }
-    def parse(_arguments)
-
-    end
-
-    sig { params(parser: OptionParser).void }
-    def define_parser(parser)
-      parser.banner("Project Templates")
-      parser.separator("")
-      # methods to define each thing go here
-      parser.separator("Specific Options:")
-      parser.separator("")
-      parser.separator("Common Options:")
-      # methods to define common things go here
+    def initialize(**opts)
+      # so this is basically the config loader.
+      # parse the options then switch on 'action'
+      # short circuit run:
+      # - verion: print version and exit
+      # - help: print help and exit
+      # - health: load config, print details about env, templates, paths, etc.
+      # full run
+      # - list: load config, list content of `templates_path`
+      # - verify: load config, load project, 'render' templates to a string, print 'unsatisfied variables',
+      #   template content, directory status, scripts
+      # - run: perform verify, if no issues, write templates out to target files, run scripts
+      @opts = opts
     end
   end
 end

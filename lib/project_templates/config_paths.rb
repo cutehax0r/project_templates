@@ -9,14 +9,14 @@ module ProjectTemplates
   class ConfigPaths
     extend T::Sig
 
-    # TODO: Maybe these should be lambdas so they resolve at run time not parse time
+    # Maybe these should be lambdas so they resolve at run time not parse time
     DEFAULT_TEMPLATE = T.let(Pathname.new("~/.share/project_templates").expand_path, Pathname)
     DEFAULT_WORKING = T.let(Pathname.new(Dir.pwd).expand_path, Pathname)
 
     sig do
       params(
-        project_name: String,
-        target_name: String,
+        project: T.nilable(String),
+        target: T.nilable(String),
         template_path: String,
         working_path: String
       ).void
@@ -24,17 +24,15 @@ module ProjectTemplates
     # initializes the paths used in the config. By default paths will be
     # expanded. if a path is provided it will expanded to an absolute one.
     def initialize(
-      project_name:,
-      target_name:,
+      project: nil,
+      target: nil,
       template_path: DEFAULT_TEMPLATE.to_s,
       working_path: DEFAULT_WORKING.to_s
     )
-      @project_name = project_name
-      @target_name = target_name
-      @template = T.let(Pathname.new(template_path).expand_path, Pathname)
-      @working = T.let(Pathname.new(working_path).expand_path, Pathname)
-      @project = T.let(@template.join(project_name).expand_path, Pathname)
-      @target = T.let(@working.join(target_name).expand_path, Pathname)
+      @project_name = project
+      @target_name = target
+      @template_path = T.let(Pathname.new(template_path).expand_path, Pathname)
+      @working_path = T.let(Pathname.new(working_path).expand_path, Pathname)
       @errors = T.let([], T::Array[String])
       valid?
     end
@@ -42,11 +40,12 @@ module ProjectTemplates
     sig { returns(T::Boolean) }
     # are all the paths valid readable / writable locations?
     def valid?
+      # handle nil project and template
       @errors.clear
-      @errors << "template path cannot be read" unless @template.readable?
-      @errors << "project path cannot be read" unless @project.readable?
-      @errors << "working directory cannot be written" unless @working.writable?
-      @errors << "target directory already exists" if @target.writable?
+      @errors << "template path cannot be read" unless @template_path&.readable?
+      @errors << "project path cannot be read" unless @project_path&.readable?
+      @errors << "working directory cannot be written" unless @working_path&.writable?
+      @errors << "target directory already exists" if @target_path&.writable?
       @errors.empty?
     end
 
@@ -56,26 +55,26 @@ module ProjectTemplates
 
     sig { returns(String) }
     # that path where templates can be found
-    def template
-      @template.to_s
+    def template_path
+      @template_path.to_s
     end
 
     sig { returns(String) }
     # the path to where the project template can be found
-    def project
-      @project.to_s
+    def project_path
+      T.let(@template_path.join(project_name).expand_path, Pathname).to_s
     end
 
     sig { returns(String) }
     # the path where the target for the project template will be built
-    def working
-      @working.to_s
+    def working_path
+      @working_path.to_s
     end
 
     sig { returns(String) }
     # the path to where the project template will be built
-    def target
-      @target.to_s
+    def target_path
+      T.let(@working.join(target_name).expand_path, Pathname).to_s
     end
   end
 end

@@ -4,14 +4,9 @@
 
 require "project_templates"
 require "sorbet-runtime"
+require "pry"
 
 module ProjectTemplates
-  project = "foo"
-  target = "bar"
-  variables = ConfigVariables.new
-  paths = ConfigPaths.new(project_name: project, target_name: target)
-  config = ProjectTemplates::Config.new(project:, target:, variables:, paths:)
-
-  app = App.new(config)
+  app = App.configure(ARGV)
   app.run
 end
