@@ -21,6 +21,9 @@ module ProjectTemplates
         path_project: opts[:path_project].to_s,
         variables: opts[:variables].to_s
       )
+    rescue OptionParser::MissingArgument => e
+      puts e.message
+      exit(1)
     end
 
     sig { params(project: T.untyped, target: T.untyped, opts: T.untyped).returns(Symbol) }
@@ -38,8 +41,12 @@ module ProjectTemplates
       OptionParser.new do |opts|
         opts.banner = "Usage: project_templates project template [options]"
         opts.on("-h", "--help", "print help")
-        opts.on("-v", "--version", "print version help")
+        opts.on("--version", "print version help")
         opts.on("-l", "--list", "show all templates")
+        opts.on("-tPATH", "--path_templates=PATH", "path to templates")
+        opts.on("-pPATH", "--path_project=PATH", "path to projet")
+        opts.on("-gPATH", "--path_target=PATH", "path to target")
+        opts.on("-vVARS", "--variables=VARS", "variables as json")
       end
     end
 

@@ -4,7 +4,7 @@ module ProjectTemplates
   module Actions
     class Help
       include Action
-      def check_conditions
+      def check_requirements
         # nothing to check
       end
 
