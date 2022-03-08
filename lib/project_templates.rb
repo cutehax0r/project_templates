@@ -5,6 +5,7 @@ require "sorbet-runtime"
 
 require_relative "project_templates/app"
 require_relative "project_templates/config"
+require_relative "project_templates/template"
 require_relative "project_templates/version"
 require_relative "project_templates/actions/action"
 require_relative "project_templates/actions/create"
